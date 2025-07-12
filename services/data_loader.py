@@ -1,11 +1,11 @@
 import os
 import cv2
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 
-
-def load_images_from_folder(folder):
-    gray_images = []
+def load_images_from_folder(folder, grayscale=True):
+    images = []
     labels = []
 
     for root, _, files in os.walk(folder):
@@ -16,30 +16,76 @@ def load_images_from_folder(folder):
                 if filename.endswith('.ppm'):
                     img_path = os.path.join(root, filename)
                     img = cv2.imread(img_path)
-                    if img is not None:
-                        # Konvertuojame į nespalvotą (grayscale)
-                        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                        # Keičiame dydį į 64x64
-                        resized_gray = cv2.resize(gray_img, (64, 64))
-                        # Normalizuojame
-                        normalized_gray = resized_gray / 255.0
-                        gray_images.append(normalized_gray)
+                    if img is None:
+                        print(f"Negalima atidaryti failo: {img_path}")
+                    else:
+                        if grayscale:
+                            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                        img = cv2.resize(img, (64, 64))
+                        img = img / 255.0  # normalizuojam į [0, 1]
+                        images.append(img.astype(np.float32))  # užtikriname, kad būtų teisingas tipas
                         labels.append(label)
 
-    return np.array(gray_images), np.array(labels)
+    print(f"✅ Įkelta treniravimo vaizdų: {len(images)}")
+    return np.array(images), np.array(labels, dtype=np.int32)
 
+def load_test_data_with_labels(image_folder, labels_csv, grayscale=True):
+    images = []
+    labels = []
 
-def prepare_data(image_folder):
-    X_gray, y = load_images_from_folder(image_folder)
-    # Pakeičiame formą, kad tiktų modeliams
-    X_gray = X_gray.reshape(X_gray.shape[0], 64, 64, 1)
+    df = pd.read_csv(labels_csv, sep=';')
 
-    # Padalijame į train, val ir test rinkinius
-    X_gray_temp, X_gray_test, y_temp, y_test = train_test_split(
-        X_gray, y, test_size=0.2, random_state=42, stratify=y
+    for _, row in df.iterrows():
+        filename = row['Filename']
+        label = int(row['ClassId'])
+        img_path = os.path.join(image_folder, filename)
+
+        img = cv2.imread(img_path)
+        if img is None:
+            print(f"Negalima atidaryti failo: {img_path}")
+        else:
+            if grayscale:
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            img = cv2.resize(img, (64, 64))
+            img = img / 255.0
+            images.append(img.astype(np.float32))  # užtikriname, kad būtų teisingas tipas
+            labels.append(label)
+
+    print(f"✅ Įkelta testavimo vaizdų: {len(images)}")
+    return np.array(images), np.array(labels, dtype=np.int32)
+
+def load_data(train_folder, test_folder, test_csv):
+    # Įkeliame treniravimo ir testavimo duomenis
+    X_train, y_train = load_images_from_folder(train_folder)
+    X_test, y_test = load_test_data_with_labels(test_folder, test_csv)
+
+    # Pridedame kanalo dimensiją jei grayscale
+    X_train = X_train.reshape(-1, 64, 64, 1)
+    X_test = X_test.reshape(-1, 64, 64, 1)
+
+    # Padaliname treniravimo duomenis į treniravimą ir validaciją
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train, y_train, test_size=0.2, stratify=y_train, random_state=42
     )
 
-    X_gray_train, X_gray_val, y_train, y_val = train_test_split(
-        X_gray_temp, y_temp, test_size=0.2, random_state=42, stratify=y_temp
-    )
-    return X_gray_train, X_gray_val, X_gray_test, y_train, y_val, y_test
+    print(f"🔹 Final train size: {X_train.shape[0]}")
+    print(f"🔹 Validation size: {X_val.shape[0]}")
+    print(f"🔹 Test size: {X_test.shape[0]}")
+    return X_train, y_train, X_val, y_val, X_test, y_test
+
+
+
+def prepare_data(train_folder, test_folder=None, test_csv=None):
+    # Įkeliame treniravimo duomenis
+    X_train, y_train = load_images_from_folder(train_folder, grayscale=True)
+
+    # Padaliname į mokymo ir validacijos duomenis
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, stratify=y_train, random_state=42)
+
+    # Jei yra testavimo duomenys, įkeliame juos
+    if test_folder and test_csv:
+        X_test, y_test = load_test_data_with_labels(test_folder, test_csv)
+        return X_train, X_val, y_train, y_val, X_test, y_test
+    else:
+        # Jei nėra testavimo duomenų, grąžiname tik treniravimo ir validacijos duomenis
+        return X_train, X_val, y_train, y_val
