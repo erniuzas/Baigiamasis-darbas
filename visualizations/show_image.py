@@ -14,3 +14,13 @@ def show_grayscale_image(image_array, index=0, scale=256):
     cv2.imshow('Grayscale Image', enlarged_img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+from PIL import Image
+import matplotlib.pyplot as plt
+
+img = Image.open("data/training/00009/00000_00010.ppm")
+
+plt.imshow(img, interpolation='nearest')  # labai svarbu
+plt.title("Class ID: 0")
+plt.axis('off')
+plt.show()

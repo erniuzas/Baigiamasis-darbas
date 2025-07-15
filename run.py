@@ -11,15 +11,8 @@ from database.init_db import init_db
 
 init_db()  # Initialize the database
 
-def set_seeds(seed=42):
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    random.seed(seed)
-    np.random.seed(seed)
-    tf.random.set_seed(seed)
-    tf.config.experimental.enable_op_determinism()
 
 def main():
-    set_seeds(42)
 
     # 1. Parametrai
     train_image_folder = 'data/training'
@@ -62,6 +55,8 @@ def main():
     )
 
     history_custom = train_model(model_custom, X_train, y_train, X_val, y_val, epochs=10, batch_size=32)
+
+    model_custom.save('custom_cnn_model.h5')
 
     loss_cust, acc_cust = model_custom.evaluate(X_test, y_test, verbose=0)
     print(f"▶ Patobulinto modelio testo tikslumas: {acc_cust:.2%}")

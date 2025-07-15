@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Modelio UI</title>
+  </head>
+  <body>
+    <h1>Įkelkite paveikslėlį klasifikacijai</h1>
+    <form method="POST" enctype="multipart/form-data">
+      <input type="file" name="image" accept="image/*" required />
+      <button type="submit">Pateikti</button>
+    </form>
+
+    {% if prediction %}
+    <h2>Rezultatas: {{ prediction }}</h2>
+    {% endif %}
+  </body>
+</html>
