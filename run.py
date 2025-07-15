@@ -4,36 +4,49 @@ from services.trainer import train_model
 from visualizations.training_plots import plot_training_results
 import numpy as np
 import os
+import random
+import tensorflow as tf
+from database.init_db import init_db
+# from models.classical.Randomforest import RandomForestModel
+
+init_db()  # Initialize the database
+
+def set_seeds(seed=42):
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    tf.random.set_seed(seed)
+    tf.config.experimental.enable_op_determinism()
 
 def main():
-    # 1. Parametrai
-    train_image_folder = 'data/training'  # Mokymui skirti duomenys
-    test_image_folder = 'data/test/Images'  # Testavimui skirti duomenys
-    test_csv_path = 'data/test/GT-final_test.csv'  # Patikrinkite, ar kelias į failą yra teisingas
+    set_seeds(42)
 
-    # Patikriname, ar testavimo failas egzistuoja
+    # 1. Parametrai
+    train_image_folder = 'data/training'
+    test_image_folder = 'data/test/Images'
+    test_csv_path = 'data/test/GT-final_test.csv'
+
     if os.path.exists(test_csv_path):
         print(f"Failas rastas: {test_csv_path}")
     else:
         print(f"Failas nerastas: {test_csv_path}")
-        return  # Nutraukiamas programos vykdymas, jei failo nėra
+        return
 
-    input_shape = (64, 64, 1)  # Nespalvotų nuotraukų dydis (1 kanalas)
+    input_shape = (64, 64, 1)
 
-    # 2. Įkeliame ir paruošiame mokymo duomenis
-    X_train, y_train = load_images_from_folder(train_image_folder, grayscale=True)  # Nustatome, kad norime nespalvotų nuotraukų
+    # 2. Duomenų paruošimas
+    X_train, y_train = load_images_from_folder(train_image_folder, grayscale=True)
     X_train, X_val, y_train, y_val, X_test, y_test = prepare_data(
-        train_image_folder, test_folder=test_image_folder, test_csv=test_csv_path)  # Padalijame į mokymo ir validacijos bei testavimo rinkinius
-    num_classes = len(np.unique(y_train))  # Skaičiuojame klasių kiekį
+        train_image_folder, test_folder=test_image_folder, test_csv=test_csv_path)
 
-    # 3. Įkeliame ir paruošiame testavimo duomenis
+    num_classes = len(np.unique(y_train))
+
     print(f"Testavimo duomenų kiekis: {len(X_test)}")
     print(f"Klasių kiekis testavimui: {num_classes}")
-
     print(f'X_train size: {X_train.shape[0]}')
     print(f'y_train size: {y_train.shape[0]}')
 
-    # 4. Patobulintas modelis su hiperparametrais
+    # 3. CNN modelis
     model_custom = cnn_with_new_hyperparameters(
         input_shape=input_shape,
         num_classes=num_classes,
@@ -48,15 +61,17 @@ def main():
         optimizer_type='rmsprop'
     )
 
-    # Treniruojame modelį
     history_custom = train_model(model_custom, X_train, y_train, X_val, y_val, epochs=10, batch_size=32)
 
-    # Įvertiname modelį su testavimo duomenimis
     loss_cust, acc_cust = model_custom.evaluate(X_test, y_test, verbose=0)
     print(f"▶ Patobulinto modelio testo tikslumas: {acc_cust:.2%}")
 
-    # 5. Vizualizacija ir palyginimas
     plot_training_results(history_custom, labels=("Custom CNN"))
+
+    # 4. Random Forest (jei norėsi)
+    # rf_model = RandomForestModel()
+    # rf_model.fit(X_train, y_train)
+    # rf_model.evaluate(X_test, y_test)
 
 if __name__ == "__main__":
     main()

@@ -88,5 +88,6 @@ venv.bak/
 *.npz
 *.npy
 *.ppm
+*.db
 data/
 logs/
