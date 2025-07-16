@@ -18,7 +18,7 @@ def show_grayscale_image(image_array, index=0, scale=256):
 from PIL import Image
 import matplotlib.pyplot as plt
 
-img = Image.open("data/training/00009/00000_00010.ppm")
+img = Image.open("data/training/00005/00000_00001.ppm")
 
 plt.imshow(img, interpolation='nearest')  # labai svarbu
 plt.title("Class ID: 0")
