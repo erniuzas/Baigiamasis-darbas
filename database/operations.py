@@ -24,7 +24,7 @@ def import_csv_to_db(csv_path='data/test/GT-final_test.csv', db_path='sqlite:///
 
     session.commit()
     session.close()
-    print("✅ CSV įkeltas į duomenų bazę.")
+    print("CSV įkeltas į duomenų bazę.")
 def fetch_signs(limit=5):
     engine = create_engine('sqlite:///traffic_signs.db')
     Session = sessionmaker(bind=engine)
@@ -35,7 +35,7 @@ def fetch_signs(limit=5):
         print(f"{sign.filename} → klasė: {sign.class_id}")
 
     session.close()
-    print("✅ Duomenų bazė sukurta ir užpildyta iš CSV.")
+    print("Duomenų bazė sukurta ir užpildyta iš CSV.")
 
 
 def save_prediction(filename, predicted_class, confidence):

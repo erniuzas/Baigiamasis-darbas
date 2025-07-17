@@ -20,7 +20,6 @@ import matplotlib.pyplot as plt
 
 img = Image.open("data/training/00005/00000_00001.ppm")
 
-plt.imshow(img, interpolation='nearest')  # labai svarbu
-plt.title("Class ID: 0")
+plt.imshow(img, interpolation='nearest')  
 plt.axis('off')
 plt.show()

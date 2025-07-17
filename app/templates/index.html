@@ -1,17 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="lt">
   <head>
-    <title>Modelio UI</title>
+    <meta charset="UTF-8" />
+    <title>Klasifikatorius</title>
   </head>
   <body>
-    <h1>Įkelkite paveikslėlį klasifikacijai</h1>
-    <form method="POST" enctype="multipart/form-data">
-      <input type="file" name="image" accept=".png,.jpg,.jpeg,.ppm" />
+    <h1>Įkelkite kelio ženklą</h1>
+
+    <form method="POST" enctype="multipart/form-data" action="/">
+      <input type="file" name="image" required />
       <button type="submit">Pateikti</button>
     </form>
 
-    {% if prediction %}
-    <h2>Rezultatas: {{ prediction }}</h2>
+    {% if image_url %}
+    <h2>Įkelta nuotrauka:</h2>
+    <img src="{{ image_url }}" alt="Įkelta nuotrauka" width="200" />
+    {% endif %} {% if prediction %}
+    <h2>Rezultatas:</h2>
+    <p>{{ prediction }}</p>
     {% endif %}
   </body>
 </html>

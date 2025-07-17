@@ -18,14 +18,14 @@ class RandomForestModel:
         return X.reshape(X.shape[0], -1)
 
     def fit(self, X_train, y_train):
-        print("🟡 Mokome Random Forest modelį...")
+        print(" Mokome Random Forest modelį...")
         X_train_flat = self.flatten(X_train)
 
         # (Pasirinktinai) naudoti tik dalį duomenų greitesniam mokymui
         sample_size = min(5000, len(X_train_flat))
         self.model.fit(X_train_flat[:sample_size], y_train[:sample_size])
         self.is_fitted = True
-        print("✅ Modelis apmokytas.")
+        print(" Modelis apmokytas.")
 
     def predict(self, X):
         if not self.is_fitted:
@@ -36,13 +36,13 @@ class RandomForestModel:
     def evaluate(self, X_test, y_test):
         if not self.is_fitted:
             raise ValueError("Modelis dar nebuvo apmokytas.")
-        print("🧪 Vertiname Random Forest modelį...")
+        print(" Vertiname Random Forest modelį...")
         y_pred = self.predict(X_test)
         acc = accuracy_score(y_test, y_pred)
-        print(f"\n🎯 Tikslumas: {acc * 100:.2f}%")
-        print("\n📊 Klasifikacijos ataskaita:")
+        print(f"\n Tikslumas: {acc * 100:.2f}%")
+        print("\n Klasifikacijos ataskaita:")
         print(classification_report(y_test, y_pred))
-        print("\n🧩 Klaidų matrica:")
+        print("\n Klaidų matrica:")
         cm = confusion_matrix(y_test, y_pred)
         self.plot_confusion_matrix(cm)
         return acc

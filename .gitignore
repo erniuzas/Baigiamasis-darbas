@@ -76,6 +76,7 @@ venv.bak/
 *.log
 
 # Data / Models
+*.keras
 *.h5
 *.hdf5
 *.ckpt
