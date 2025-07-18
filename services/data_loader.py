@@ -13,7 +13,7 @@ def load_images_from_folder(folder, grayscale=True):
         if class_id.isdigit():
             label = int(class_id)
             for filename in files:
-                #  Paliekame tik JPG tipo failus
+                
                 if os.path.splitext(filename)[1].lower() in ['.jpg', '.jpeg']:
                     img_path = os.path.join(root, filename)
                     try:

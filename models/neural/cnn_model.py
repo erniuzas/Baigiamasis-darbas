@@ -60,3 +60,40 @@ def lr_scheduler(epoch, lr):
 
 early_stop = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 callbacks = [early_stop, LearningRateScheduler(lr_scheduler)]
+
+#Seenoji versija, kuri buvo naudojama anksčiau, bet buvo pastebimas overfitingas
+# def cnn_with_new_hyperparameters(input_shape, num_classes, filters=32, kernel_size=(3, 3), pool_size=(2, 2), dense_units=128, 
+#                                  dropout_rate=0.5, learning_rate=0.001, use_batch_norm=True, l2_reg=0.01, optimizer_type='adam'):
+#     # Pasirinkti optimizatorių pagal naudotojo pasirinkimą
+#     if optimizer_type == 'adam':
+#         optimizer = Adam(learning_rate=learning_rate)
+#     elif optimizer_type == 'sgd':
+#         optimizer = SGD(learning_rate=learning_rate, momentum=0.9)
+#     elif optimizer_type == 'rmsprop':
+#         optimizer = RMSprop(learning_rate=learning_rate)
+#     else:
+#         raise ValueError("Nepalaikomas optimizatorius! Galimi variantai: 'adam', 'sgd', 'rmsprop'.")
+
+#     model = models.Sequential([
+#         layers.Input(shape=input_shape),  # Teisingas būdas nurodyti input_shape
+#         layers.Conv2D(filters, kernel_size, activation='relu', kernel_regularizer=l2(l2_reg)),
+#         layers.MaxPooling2D(pool_size),
+#         layers.Conv2D(filters * 2, kernel_size, activation='relu', kernel_regularizer=l2(l2_reg)),
+#         layers.MaxPooling2D(pool_size),
+        
+#         # Jei norime naudoti batch normalization
+#         layers.BatchNormalization() if use_batch_norm else layers.Layer(),
+        
+#         layers.Flatten(),
+#         layers.Dense(dense_units, activation='relu', kernel_regularizer=l2(l2_reg)),
+        
+#         # Dropout po tankio sluoksnio
+#         layers.Dropout(dropout_rate),
+        
+#         layers.Dense(num_classes, activation='softmax')
+#     ])
+    
+#     model.compile(optimizer=optimizer,
+#                   loss='sparse_categorical_crossentropy',
+#                   metrics=['accuracy'])
+#     return model
